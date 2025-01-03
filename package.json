@@ -3,15 +3,26 @@
   "version": "1.0.0",
   "description": "Este proyecto es un sistema de gestión escolar para el Colegio Alicante. Permite la gestión de reuniones de apoderados, pagos de colegiaturas, asistencia y comunicaciones informativas.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "npm src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.12.0",
+    "pg": "^8.13.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.9"
   }
 }
