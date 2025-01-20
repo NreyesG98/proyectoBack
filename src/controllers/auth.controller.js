@@ -1,125 +1,162 @@
-import User from '../models/user.model.js'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import { createAccessToken } from '../libs/jwt.js'
-import {TOKEN_SECRET} from '../config.js'
-
-export const register = async (req, res) => {
-  const { email, password, username } = req.body
-
-  try {
-    const userFound = await User.findOne({ email: email })
-    if (userFound) return res.status(400).json(['El usuario ya existe'])
-
-    const passwordHash = await bcrypt.hash(password, 10)
-
-    const newUser = new User({
-      username,
-      email,
-      password: passwordHash,
-    })
-  
-    const userSaved = await newUser.save()
-
-    const token = await createAccessToken({ id: userSaved._id })
-
-    res.cookie('token', token, {
-      secure: true
-    })
-
-    res.status(200).json({
-      message: "User created successfully",
-      user: {
-        id: userSaved._id,
-        username: userSaved.username,
-        email: userSaved.email,
-        createdAt: newUser.createdAt
-      }
-    })
-
-  } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
-  }
-
-  
-}
+// filepath: /c:/Users/martin/Desktop/ProyectoFinal/src/controllers/auth.controller.js
+import Apoderado from '../models/apoderado.model.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 export const login = async (req, res) => {
-  const { username, password } = req.body
+  const { correo_apo, contrasena_apo } = req.body;
 
   try {
-    const userFound = await User.findOne({username})
-    if (!userFound) return res.status(400).json({ message: 'User not found' })
+    // Buscar al usuario por correo electrónico
+    const apoderado = await Apoderado.findOne({ where: { correo_apo } });
 
-    const isMatch = await bcrypt.compare(password, userFound.password)
+    if (!apoderado) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
 
-    if (!isMatch) return res.status(400).json({ message: 'Wrong password' })
+    // Verificar la contraseña
+    const isMatch = await bcrypt.compare(contrasena_apo, apoderado.contrasena_apo);
 
-    const token = await createAccessToken({ id: userFound._id })
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Contraseña incorrecta' });
+    }
 
-    res.cookie('token', token, {
-      secure: true,
-      sameSite: 'none',
-      // httpOnly: false, // TODO: change next to true for security
-    })
+    // Generar el token JWT
+    const token = jwt.sign(
+      { id: apoderado.id_apoderado, tipo: apoderado.tipo_apo },
+      'your_jwt_secret', // Reemplaza con tu clave secreta
+      { expiresIn: '1h' }
+    );
 
-    res.status(200).json({
-      message: "User found successfully",
-      user: {
-        id: userFound._id,
-        username: userFound.username,
-        email: userFound.email,
-        createdAt: userFound.createdAt
-      }
-    })
-
+    res.json({ token, tipo: apoderado.tipo_apo });
   } catch (error) {
-    res.status(500).json({
-      message: error.message
-    })
+    console.error('Error en el inicio de sesión: ', error);
+    res.status(500).json({ message: 'Error en el servidor' });
   }
-  
-}
+};
 
-export const verifyToken = async (req, res) => {
-  const {token} = req.cookies
+export const register = async (req, res) => {
+  const { id_apoderado,nombre_apo, apellido_apo, telefono_apo, correo_apo, contrasena_apo, direccion_apo, tipo_apo } = req.body;
 
-  if (token) return res.status(401).json({ message: "Unauthorized" })
-    
-  jwt.verify(token, TOKEN_SECRET, async (err, user) => {
-    if(err) return res.status(401).json({ message: "Unauthorized" })
+  try {
+    // Verificar si el usuario ya existe
+    const existingUser = await Apoderado.findOne({ where: { correo_apo } });
 
-    const userFound = await User.findById(user.id)
-    if (!userFound) return res.status(401).json({ message: "Unauthorized" })
+    if (existingUser) {
+      return res.status(400).json({ message: 'El correo electrónico ya está en uso' });
+    }
 
-    return res.status(200).json({
-      id: userFound._id,
-      username: userFound.username,
-      email: userFound.email,
-      createdAt: userFound.createdAt
-    })
-  })
-}
+    // Encriptar la contraseña
+    const hashedPassword = await bcrypt.hash(contrasena_apo, 10);
 
-export const logout = (req, res) => {
-  res.cookie('token', "",{
-    expires: new Date(0)
-  })
-  return res.sendStatus(200)
-}
+    // Crear el nuevo usuario
+    const newUser = await Apoderado.create({
+      id_apoderado,
+      nombre_apo,
+      apellido_apo,
+      telefono_apo,
+      correo_apo,
+      contrasena_apo: hashedPassword,
+      direccion_apo,
+      tipo_apo,
+    });
 
-export const profile = async (req, res) => {
-  const userFound = await User.findById(req.user.id)
+    res.status(201).json({ message: 'Usuario registrado exitosamente', newUser });
+  } catch (error) {
+    console.error('Error en el registro: ', error);
+    res.status(500).json({ message: 'Error en el servidor' });
+  }
+};
 
-  if (!userFound) return res.status(400).json({ message: 'User not found' })
+export const getUsers = async (req, res) => {
+  try {
+    const users = await Apoderado.findAll();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Error obteniendo usuarios', error });
+  }
+};
 
-  return res.json({ 
-    id: userFound._id,
-    username: userFound.username,
-    email: userFound.email,
-    createdAt: userFound.createdAt
-  })
 
-}
+export const createUsers = async (req, res) => {
+  const users = req.body.users;
+
+  try {
+      const createdUsers = [];
+
+      for (const user of users) {
+          const { id_apoderado, nombre_apo, apellido_apo, telefono_apo, correo_apo, contrasena_apo, direccion_apo, tipo_apo } = user;
+
+          // Verificar si el usuario ya existe
+          const existingUser = await Apoderado.findOne({ where: { correo_apo } });
+
+          if (existingUser) {
+              return res.status(400).json({ message: `El correo electrónico ${correo_apo} ya está en uso` });
+          }
+
+          // Encriptar la contraseña
+          const hashedPassword = await bcrypt.hash(contrasena_apo, 10);
+
+          // Crear el nuevo usuario
+          const newUser = await Apoderado.create({
+              id_apoderado,
+              nombre_apo,
+              apellido_apo,
+              telefono_apo,
+              correo_apo,
+              contrasena_apo: hashedPassword,
+              direccion_apo,
+              tipo_apo,
+          });
+
+          createdUsers.push(newUser);
+      }
+
+      res.status(201).json({ message: 'Usuarios registrados exitosamente', createdUsers });
+  } catch (error) {
+      console.error('Error en el registro de usuarios: ', error);
+      res.status(500).json({ message: 'Error en el servidor' });
+  }
+};
+
+export const updateUser = async (req, res) => {
+  const { id } = req.params;
+  const { nombre_apo, apellido_apo, telefono_apo, correo_apo, direccion_apo, tipo_apo, estado_apo } = req.body;
+
+  try {
+    const user = await Apoderado.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    user.nombre_apo = nombre_apo;
+    user.apellido_apo = apellido_apo;
+    user.telefono_apo = telefono_apo;
+    user.correo_apo = correo_apo;
+    user.direccion_apo = direccion_apo;
+    user.tipo_apo = tipo_apo;
+    user.estado_apo = estado_apo;
+    await user.save();
+    res.json({ message: 'Usuario actualizado exitosamente', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Error actualizando usuario', error });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await Apoderado.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    await user.destroy();
+    res.json({ message: 'Usuario eliminado exitosamente' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error eliminando usuario', error });
+  }
+};
+
+////--------------------------------////
