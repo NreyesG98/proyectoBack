@@ -1,4 +1,1 @@
-
-export const PORT = 4000;
-
-export const TOKEN_SECRET = 'fonasa_secret';
+export const TOKEN_SECRET = 'name_secret'

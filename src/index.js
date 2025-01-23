@@ -9,11 +9,13 @@
 
 // filepath: /c:/Users/martin/Desktop/ProyectoFinal/src/index.js
 import express from 'express';
+import cookieParser from 'cookie-parser'; // Importa cookie-parser
 import bodyParser from 'body-parser';
 import authRoutes from './routes/auth.routes.js';
 import alumnoRoutes from './routes/alumno.routes.js';
 import asistenciaReunionesRoutes from './routes/asistenciaReuniones.routes.js';
 import registroPagosReunionesRoutes from './routes/registroPagosReuniones.routes.js';
+import protectedRoutes from './routes/protected.routes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -39,10 +41,13 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
+app.use(cookieParser()); // Añade cookie-parser
 app.use('/api', authRoutes);
 app.use('/api', alumnoRoutes);
 app.use('/api', asistenciaReunionesRoutes);
 app.use('/api', registroPagosReunionesRoutes);
+app.use('/api', protectedRoutes); // Añadir rutas protegidas
+
 
 
 

@@ -160,3 +160,24 @@ export const deleteUser = async (req, res) => {
 };
 
 ////--------------------------------////
+
+
+export const verifyToken = async (req, res) => {
+  const {token} = req.cookies
+
+  if (token) return res.status(401).json({ message: "Unauthorized" })
+    
+  jwt.verify(token, TOKEN_SECRET, async (err, user) => {
+    if(err) return res.status(401).json({ message: "Unauthorized" })
+
+    const userFound = await User.findById(user.id)
+    if (!userFound) return res.status(401).json({ message: "Unauthorized" })
+
+    return res.status(200).json({
+      id: userFound._id,
+      username: userFound.username,
+      email: userFound.email,
+      createdAt: userFound.createdAt
+    })
+  })
+}

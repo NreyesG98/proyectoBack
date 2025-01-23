@@ -12,13 +12,3 @@ Este proyecto es un sistema de gestión escolar para el Colegio Alicante. Permit
 ## Requisitos Previos
 
 Antes de comenzar, asegúrate de tener instalado [Node.js](https://nodejs.org/) en tu máquina.
-
-## Instalación
-
-Sigue estos pasos para instalar la aplicación:
-
-1. **Clona el repositorio:**
-
-   ```bash
-   git clone https://github.com/usuario/alicia-school-management.git // cambiar ruta 
-   cd alicia-school-management

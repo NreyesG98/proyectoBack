@@ -52,6 +52,7 @@ import { getPagos, createPago, findPago, deletePago, updatePago , getCursos} fro
 import { getReuniones, createReunion, findReunion, deleteReunion, updateReunion } from '../controllers/reunion.controllers.js';
 import { login, register,getUsers,updateUser,deleteUser ,createUsers} from '../controllers/auth.controller.js';
 import auth from '../middlewares/validateToken.js';
+import { verifyToken, checkRole } from '../middlewares/authMiddleware.js';
 
 
 
@@ -67,6 +68,9 @@ router.get('/protected', auth, (req, res) => {
     res.json({ message: 'Acceso concedido a la ruta protegida', user: req.user });
   });
 
+router.get('/protected', checkRole, (req, res) => {
+    res.json({ message: 'Acceso concedido a la ruta protegida', user: req.user });
+  });
 
 // Define la ruta para obtener todos los usuarios
 router.get('/users', auth, getUsers);
