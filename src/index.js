@@ -11,6 +11,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser'; // Importa cookie-parser
 import bodyParser from 'body-parser';
+import morgan from 'morgan'; // Importa Morgan
 import authRoutes from './routes/auth.routes.js';
 import alumnoRoutes from './routes/alumno.routes.js';
 import asistenciaReunionesRoutes from './routes/asistenciaReuniones.routes.js';
@@ -58,6 +59,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use(errorHandler);
 connectDB();
 
+app.use(morgan('combined'));
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
