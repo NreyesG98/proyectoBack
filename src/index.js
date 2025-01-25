@@ -21,13 +21,14 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import errorHandler from './middlewares/errorHandler.js';
 import cors from 'cors';
-
+import { connectDB } from './db.js'; // Importa la función connectDB
+import { PORT,URL_NEXT } from './config.js'; 
 
 
 dotenv.config();
 
 const app = express();
-const port = 4000;
+const port = PORT || 4000;
 
 // Define __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -36,7 +37,7 @@ const __dirname = path.dirname(__filename);
 
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Reemplaza con el dominio de tu frontend
+  origin: URL_NEXT, // Reemplaza con el dominio de tu frontend
   credentials: true,
 }));
 
@@ -55,6 +56,8 @@ app.use('/api', protectedRoutes); // Añadir rutas protegidas
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(errorHandler);
+connectDB();
+
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

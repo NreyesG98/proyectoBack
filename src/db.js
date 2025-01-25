@@ -1,14 +1,22 @@
 import { Sequelize } from 'sequelize';
+import { DB_HOST,DB_USER,DB_PASS,DB_NAME} from './config.js';
 
-const sequelize = new Sequelize('colegioDB', 'postgres', 'Flor2020.', {
-  host: 'localhost',
-  dialect: 'postgres',
-  port: 5432, // Asegúrate de que este sea el puerto correcto
-  logging: false, // Puedes habilitar o deshabilitar el logging
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
+  host: DB_HOST,
+  port: 5432,
+  dialect: 'postgres', // o el dialecto que estés usando (mysql, sqlite, etc.)
 });
 
-export default sequelize;
+export const connectDB = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Conexión a la base de datos establecida correctamente.');
+  } catch (error) {
+    console.error('No se pudo conectar a la base de datos:', error);
+  }
+};
 
+export default sequelize;
 
 // // ! Nombre db: colegioDB
 // import pg from 'pg'
