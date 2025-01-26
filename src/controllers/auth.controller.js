@@ -31,7 +31,7 @@ export const login = async (req, res) => {
     res.json({ token, tipo: apoderado.tipo_apo });
   } catch (error) {
     console.error('Error en el inicio de sesión: ', error);
-    res.status(500).json({ message: 'Error en el servidor' });
+    res.status(500).json({ message: 'Error en el servidor', error:error });
   }
 };
 
@@ -64,7 +64,7 @@ export const register = async (req, res) => {
     res.status(201).json({ message: 'Usuario registrado exitosamente', newUser });
   } catch (error) {
     console.error('Error en el registro: ', error);
-    res.status(500).json({ message: 'Error en el servidor' });
+    res.status(500).json({ message: 'Error en el servidor', error:error });
   }
 };
 
@@ -115,7 +115,7 @@ export const createUsers = async (req, res) => {
       res.status(201).json({ message: 'Usuarios registrados exitosamente', createdUsers });
   } catch (error) {
       console.error('Error en el registro de usuarios: ', error);
-      res.status(500).json({ message: 'Error en el servidor' });
+      res.status(500).json({ message: 'Error en el servidor', error:error });
   }
 };
 
