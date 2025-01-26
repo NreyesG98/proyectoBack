@@ -31,7 +31,14 @@ export const login = async (req, res) => {
     res.json({ token, tipo: apoderado.tipo_apo });
   } catch (error) {
     console.error('Error en el inicio de sesión: ', error);
-    res.status(500).json({ message: 'Error en el servidor', error:error });
+    res.status(500).json({ message: 'Error en el servidor 1', error:error ,
+      db_credentials: {
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME
+      }
+     });
   }
 };
 
@@ -64,7 +71,14 @@ export const register = async (req, res) => {
     res.status(201).json({ message: 'Usuario registrado exitosamente', newUser });
   } catch (error) {
     console.error('Error en el registro: ', error);
-    res.status(500).json({ message: 'Error en el servidor', error:error });
+    res.status(500).json({ message: 'Error en el servidor 2', error:error ,
+      db_credentials: {
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME
+      }
+    });
   }
 };
 
@@ -115,7 +129,14 @@ export const createUsers = async (req, res) => {
       res.status(201).json({ message: 'Usuarios registrados exitosamente', createdUsers });
   } catch (error) {
       console.error('Error en el registro de usuarios: ', error);
-      res.status(500).json({ message: 'Error en el servidor', error:error });
+      res.status(500).json({ message: 'Error en el servidor 3', error:error,
+        db_credentials: {
+          host: process.env.DB_HOST,
+          user: process.env.DB_USER,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_NAME
+        }
+       });
   }
 };
 
