@@ -28,7 +28,12 @@ export const login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.json({ token, tipo: apoderado.tipo_apo });
+
+
+    console.log("user data login: ", apoderado.dataValues);
+    const userValues =  apoderado.dataValues
+
+    res.json({ token, tipo: apoderado.tipo_apo,  userValues });
   } catch (error) {
     console.error('Error en el inicio de sesión: ', error);
     res.status(500).json({ message: 'Error en el servidor 1', error:error ,
