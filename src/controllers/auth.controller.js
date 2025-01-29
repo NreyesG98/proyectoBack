@@ -24,7 +24,7 @@ export const login = async (req, res) => {
     // Generar el token JWT
     const token = jwt.sign(
       { id: apoderado.id_apoderado, tipo: apoderado.tipo_apo },
-      'your_jwt_secret', // Reemplaza con tu clave secreta
+      process.env.JWT_SECRET, // Reemplaza con tu clave secreta
       { expiresIn: '1h' }
     );
 

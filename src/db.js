@@ -1,17 +1,20 @@
 import { Sequelize } from 'sequelize';
 import { DB_HOST,DB_USER,DB_PASS,DB_NAME} from './config.js';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
   host: DB_HOST,
   port: 5432,
   dialect: 'postgres',
-  dialectOptions: {
+  dialectOptions: isProduction ? {
     ssl: {
       require: true,
       rejectUnauthorized: false // Si es necesario para no validar el certificado SSL
     }
-  }
-});
+  } : {},
+}
+);
 
 export const connectDB = async () => {
   try {
